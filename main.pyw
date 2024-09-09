@@ -42,7 +42,7 @@ def main():
     df.rename(columns=dict(zip(start_labels, new_start_labels)), inplace=True)
 
     # List of labels that will be the same for each person.
-    new_labels = ['Role', 'FirstName', 'LastName', 'Email', 'Phone', 'Diet', 'DietSpecify', 'Workstatus', 'ColleagueRole', 'SpecifyColleagueRole']
+    new_labels = ['Role', 'RemotePresenter', 'FirstName', 'LastName', 'Email', 'Phone', 'Diet', 'DietSpecify', 'Workstatus', 'ColleagueRole', 'SpecifyColleagueRole']
 
     # We start at "rol1"
     startindex = 8
