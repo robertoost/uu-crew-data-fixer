@@ -50,6 +50,8 @@ def main():
 
     filepath_labels_csv = join(check_using_pyinstaller(), label_names_filename)
 
+    print('FILEPATH LABELS: ' + filepath_labels_csv)
+
     # Check whether there is a list of labels yet.
     #
     if (os.path.isfile(filepath_labels_csv)):
@@ -57,15 +59,16 @@ def main():
         # Read the file and set the labels we will use.
         #
         with open(filepath_labels_csv) as file_labels_csv:
-            file_labels = csv.reader(file_labels_csv)
+            file_labels = csv.reader(file_labels_csv, delimiter=';')
             new_labels = [label for line in file_labels for label in line]
+            print('OPENING CSV:\n' + str(new_labels))
     else:
         # There is no labels yet! Use this default list and write it to csv.
         # 
         new_labels = ['Role', 'RemotePresenter', 'FirstName', 'LastName', 'Email', 'Phone', 'Diet', 'DietSpecify', 'Workstatus', 'ColleagueRole', 'SpecifyColleagueRole']
-        
+        print('WRITING CSV!')
         with open(filepath_labels_csv, "x") as file_labels_csv:
-            writer = csv.writer(file_labels_csv)
+            writer = csv.writer(file_labels_csv, delimiter=';')
             writer.writerow(new_labels)
 
     # Clean up the labels we want to keep at the start of each row.
