@@ -6,7 +6,8 @@ import tkinter as tk
 from tkinter import filedialog
 import sys
 import os
-
+import csv
+from pathlib import Path
 
 # Code by @robertoost 
 # Written for my friend Arjen Ritzerfeld
@@ -27,22 +28,46 @@ def main():
 
     # Prompt the user for a file to fix, prepare a new filename.
     #
-    filename = filedialog.askopenfilename(filetypes=[("Excel files", ".xlsx .xls")], title="UU Crew Data fixer 9000")
-    new_filename = filename.replace(".xls", "-fixed.xls").split("/")[-1]
+    filename_excel = filedialog.askopenfilename(filetypes=[("Excel files", ".xlsx .xls")], title="UU Crew Data fixer 9000+")
+    new_filename_excel = filename_excel.replace(".xls", "-fixed.xls").split("/")[-1]
 
-    if filename == '':
+    if filename_excel == '':
         return
 
-    df = pd.read_excel(filename)
-    
+    df = pd.read_excel(filename_excel)
+
+    # Get the list of new labels that will be the same for each person.
+    #
+    new_labels = []
+    label_names_filename = '\\label_names.csv'
+
+    # This line could be nicer, but we're not getting paid for this.
+    filepath_labels_csv = str((Path(__file__).parent).resolve()) + label_names_filename
+
+    # Check whether there is a list of labels yet.
+    #
+    if (os.path.isfile(filepath_labels_csv)):
+
+        # Read the file and set the labels we will use.
+        #
+        with open(filepath_labels_csv) as file_labels_csv:
+            file_labels = csv.reader(file_labels_csv)
+            new_labels = [label for line in file_labels for label in line]
+    else:
+        # There is no labels yet! Use this default list and write it to csv.
+        # 
+        new_labels = ['Role', 'RemotePresenter', 'FirstName', 'LastName', 'Email', 'Phone', 'Diet', 'DietSpecify', 'Workstatus', 'ColleagueRole', 'SpecifyColleagueRole']
+        
+        with open(filepath_labels_csv, "x") as file_labels_csv:
+            writer = csv.writer(file_labels_csv)
+            writer.writerow(new_labels)
+
     # Clean up the labels we want to keep at the start of each row.
     #
     new_start_labels = ["FormFiller", "Programme", "SpecifyProgramme"]
     start_labels = df.columns.values[5:8]
     df.rename(columns=dict(zip(start_labels, new_start_labels)), inplace=True)
 
-    # List of labels that will be the same for each person.
-    new_labels = ['Role', 'RemotePresenter', 'FirstName', 'LastName', 'Email', 'Phone', 'Diet', 'DietSpecify', 'Workstatus', 'ColleagueRole', 'SpecifyColleagueRole']
 
     # We start at "rol1"
     startindex = 8
@@ -80,7 +105,7 @@ def main():
     df.set_index(['_fd_id', "FormFiller", "Programme", "SpecifyProgramme"], inplace=True)
     df.columns = pd.MultiIndex.from_arrays(zip(*df.columns.str.split('_')))
     df = df.stack([0]).reset_index().drop('level_4', axis=1)
-    df.to_excel(new_filename)
+    df.to_excel(new_filename_excel)
     
     return 0
 
