@@ -8,6 +8,13 @@ import sys
 import os
 import csv
 from pathlib import Path
+from os.path import join, dirname
+
+def check_using_pyinstaller():
+    if getattr(sys, 'frozen', False):
+        application_path = os.path.dirname(sys.executable)
+        return application_path
+    return os.path.dirname(os.path.abspath(__file__))
 
 # Code by @robertoost 
 # Written for my friend Arjen Ritzerfeld
@@ -39,10 +46,9 @@ def main():
     # Get the list of new labels that will be the same for each person.
     #
     new_labels = []
-    label_names_filename = '\\label_names.csv'
+    label_names_filename = 'label_names.csv'
 
-    # This line could be nicer, but we're not getting paid for this.
-    filepath_labels_csv = str((Path(__file__).parent).resolve()) + label_names_filename
+    filepath_labels_csv = join(check_using_pyinstaller(), label_names_filename)
 
     # Check whether there is a list of labels yet.
     #
@@ -105,8 +111,8 @@ def main():
     df.set_index(['_fd_id', "FormFiller", "Programme", "SpecifyProgramme"], inplace=True)
     df.columns = pd.MultiIndex.from_arrays(zip(*df.columns.str.split('_')))
     df = df.stack([0]).reset_index().drop('level_4', axis=1)
-    df.to_excel(new_filename_excel)
-    
+    df.to_excel(new_filename_excel)        
+
     return 0
 
 if __name__ == "__main__":
